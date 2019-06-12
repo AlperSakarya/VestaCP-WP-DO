@@ -32,5 +32,5 @@ bash /usr/local/vesta/bin/v-change-database-password admin admin_default DBPASSW
 echo "`date` DB Password changed" >> provision.log
 
 # Email yourself when the installation is done.
-echo echo "`hostname` is ready to login https://`ifconfig eth0 | grep \"inet addr\" | cut -d ':' -f 2 | cut -d ' ' -f 1`:8083" | mail -s "Wordpress and Control Panel is Ready" alpersakarya@gmail.com
+echo "`hostname` is ready to login https://`ifconfig eth0 | grep \"inet addr\" | cut -d ':' -f 2 | cut -d ' ' -f 1`:8083" | mail -s "Wordpress and Control Panel is Ready" alpersakarya@gmail.com
 echo "`date` Provisioning finished" >> provision.log
