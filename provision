@@ -1,0 +1,36 @@
+#!/bin/bash
+touch provision.log
+export VESTA=/usr/local/vesta/
+echo "`date` Host Provisioning is starting..." >> provision.log
+curl -O http://vestacp.com/pub/vst-install.sh
+echo "`date` VestaCP scripts downloaded..." >> provision.log
+yes | bash vst-install.sh --nginx yes --apache yes --phpfpm no --named yes --remi yes --vsftpd yes --proftpd no --iptables yes --fail2ban yes --quota no --exim yes --dovecot yes --spamassassin yes --clamav yes --mysql yes --postgresql no --email info@disual.us --password Disual02.02 --force
+echo "`date` vesta install and apt jobs finished..." >> provision.log
+rm -rf /home/admin/web/`hostname`/public_html/*
+wget https://wordpress.org/latest.tar.gz
+tar -xf latest.tar.gz
+mv wordpress/* /home/admin/web/`hostname`/public_html
+chown -R admin:admin /home/admin/web/`hostname`/public_html/*
+rm -rf wordpress
+rm -rf latest.tar.gz
+echo "`date` wp install finished" >> provision.log
+
+# You can fill in the below information to skip Word Press's 
+#cp -p /home/admin/web/`hostname`/public_html/wp-config-sample.php /home/admin/web/`hostname`/public_html/wp-config.php
+#sed -i 's/database_name_here/admin_default/g' /home/admin/web/`hostname`/public_html/wp-config.php
+#sed -i 's/username_here/admin_default/g' /home/admin/web/`hostname`/public_html/wp-config.php
+#sed -i 's/password_here/DBPASSWORD@123/g' /home/admin/web/`hostname`/public_html/wp-config.php
+#echo "`date` wp-config modified..." >> provision.log
+
+# Disabling unnecessary ports (public MySQL and ICMP access)
+bash /usr/local/vesta/bin/v-delete-firewall-rule 1
+bash /usr/local/vesta/bin/v-delete-firewall-rule 3
+echo "`date` Unnecessary firewall rules deleted 3306 and ping" >> provision.log
+
+# Changing DB password to whatever you like, user is admin
+bash /usr/local/vesta/bin/v-change-database-password admin admin_default DBPASSWORD@123
+echo "`date` DB Password changed" >> provision.log
+
+# Email yourself when the installation is done.
+echo echo "`hostname` is ready to login https://`ifconfig eth0 | grep \"inet addr\" | cut -d ':' -f 2 | cut -d ' ' -f 1`:8083" | mail -s "Wordpress and Control Panel is Ready" alpersakarya@gmail.com
+echo "`date` Provisioning finished" >> provision.log
